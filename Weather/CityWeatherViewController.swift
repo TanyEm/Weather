@@ -8,11 +8,32 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class CityWeatherViewController: UIViewController {
+    
+    @IBOutlet weak var city: UILabel!
+    @IBOutlet weak var temp: UILabel!
+    @IBOutlet weak var status: UILabel!
+    @IBOutlet weak var tempMax: UILabel!
+    @IBOutlet weak var tempMin: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        let weatherGetter = WeatherGetter()
+        weatherGetter.getWeather(cityName: "Saint-Petersburg", callback: {(result) -> () in
+            print(result)
+            DispatchQueue.main.async {
+                self.city.text = result.name
+                self.temp.text =  String(format: "%.2f°C", (result.main?.temp)!)
+                self.tempMax.text = String(format: "Max: %.0f°C", (result.main?.temp_max)!)
+                self.tempMin.text = String(format: "Min: %.0f°C", (result.main?.temp_min)!)
+                if (result.weather.count > 0) {
+                    self.status.text = result.weather[0]?.status
+                } else {
+                    self.status.text = ""
+                }
+            }
+        })
     }
 }
 
