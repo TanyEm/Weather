@@ -11,16 +11,19 @@ import UIKit
 class AllCitysTableViewController: UITableViewController, AddAndEditItemViewControllerDelegate {
     
     var items: [CityItem]
+    let weatherGetter = WeatherGetter()
     
     required init?(coder aDecoder: NSCoder) {
         items = [CityItem]()
         
         let row0item = CityItem()
         row0item.cityName = "Saint-Peterburg"
+        row0item.temp = "4"
         items.append(row0item)
         
         let row1item = CityItem()
         row1item.cityName = "Moscow"
+        row1item.temp = "3"
         items.append(row1item)
         
         super.init(coder: aDecoder)
@@ -37,8 +40,13 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
     }
 
     func configureCityName(for cell: UITableViewCell, with item: CityItem) {
-        let label = cell.viewWithTag(1000) as! UILabel
-        label.text = item.cityName
+        let labelName = cell.viewWithTag(1000) as! UILabel
+        labelName.text = item.cityName
+    }
+    
+    func configureCityTemp(for cell: UITableViewCell, with item: CityItem) {
+        let labelTemp = cell.viewWithTag(1001) as! UILabel
+        labelTemp.text = item.temp
     }
     
     func addAndEditItemViewControllerDidCancel(
@@ -74,19 +82,13 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
         return items.count
     }
     
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        if let cell = tableView.cellForRow(at: indexPath) {
-//            let item = items[indexPath.row]
-//        }
-//        tableView.deselectRow(at: indexPath, animated: true)
-//    }
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CityItem", for: indexPath)
 
         // Configure the cell...
         let item = items[indexPath.row]
         configureCityName(for: cell, with: item)
+        configureCityTemp(for: cell, with: item)
         
         return cell
     }
@@ -102,14 +104,18 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
 
     
     // MARK: - Navigation
-
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "AddCity" {
+        
+        switch segue.identifier {
+            
+        case "AddCity"?:
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! AddAndEditItemViewController
             
             controller.delegate = self
-        } else if segue.identifier == "EditCity" {
+            
+        case "EditCity"?:
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! AddAndEditItemViewController
             controller.delegate = self
@@ -117,6 +123,14 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
             if let indexPath = tableView.indexPath(for: sender as! UITableViewCell) {
                 controller.itemToEdit = items[indexPath.row]
             }
+            
+        case "ShowCity"?:
+            let path = self.tableView.indexPathForSelectedRow!
+            let viewController = segue.destination as! CityWeatherViewController
+            viewController.cityName = self.items[path.row].cityName
+            
+        default:
+            print("Error")
         }
     }
 

@@ -26,7 +26,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" tag="1000" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bmo-qU-Oxd">
-                                            <rect key="frame" x="8" y="8" width="237" height="28"/>
+                                            <rect key="frame" x="8" y="8" width="202" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" tag="1001" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="11 C" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IdW-My-PRf">
+                                            <rect key="frame" x="211" y="8" width="34" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -36,7 +43,7 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <segue destination="Lvr-3X-esV" kind="presentation" identifier="EditCity" trigger="accessoryAction" id="bUo-A4-wTb"/>
-                                    <segue destination="BYZ-38-t0r" kind="show" id="AJO-2D-rKE"/>
+                                    <segue destination="BYZ-38-t0r" kind="show" identifier="ShowCity" id="AJO-2D-rKE"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>

@@ -15,12 +15,14 @@ class CityWeatherViewController: UIViewController {
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var tempMax: UILabel!
     @IBOutlet weak var tempMin: UILabel!
+    
+    var cityName = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         let weatherGetter = WeatherGetter()
-        weatherGetter.getWeather(cityName: "Saint-Petersburg", callback: {(result) -> () in
+        weatherGetter.getWeather(cityName: cityName, callback: {(result) -> () in
             print(result)
             DispatchQueue.main.async {
                 self.city.text = result.name
