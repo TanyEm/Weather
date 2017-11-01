@@ -37,5 +37,17 @@ class CityWeatherViewController: UIViewController {
             }
         })
     }
+    
+    // MARK: - Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if (segue.identifier == "FullWeather") {
+            let controller = segue.destination as! FullWeatherTableViewController
+            controller.cityNameForMoreDay = self.cityName
+            print(controller.cityNameForMoreDay)
+        }
+        
+    }
 }
 
