@@ -19,12 +19,12 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
         
         let row0item = CityItem()
         row0item.cityName = "Saint-Peterburg"
-        row0item.temp = "4"
+        row0item.temp = ""
         items.append(row0item)
         
         let row1item = CityItem()
         row1item.cityName = "Moscow"
-        row1item.temp = "3"
+        row1item.temp = ""
         items.append(row1item)
         
         super.init(coder: aDecoder)
@@ -42,16 +42,22 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
     }
 
     func configureCityName(for cell: AllCitysTableViewCell, with item: CityItem) {
-//        let labelName = cell.viewWithTag(1000) as! UILabel
-//        labelName.text = item.cityName
         cell.nameCity?.text = item.cityName
-
     }
-//
-    func configureCityTemp(for cell: AllCitysTableViewCell, with item: CityItem) {
-//        let labelTemp = cell.viewWithTag(1001) as! UILabel
-//        labelTemp.text = item.temp
-        cell.tempCity?.text = item.temp
+
+    func configureCityTemp(for cell: AllCitysTableViewCell, with item: CityItem, for indexPath:  IndexPath) {
+    
+        let weatherGetter = WeatherGetter()
+        weatherGetter.getWeather(cityName: items[indexPath.row].cityName, callback: {(result) -> () in
+            print(result)
+            DispatchQueue.main.async {
+                let tempCity =  String(format: "%.0f°C", (result.main?.temp)!)
+                print(tempCity)
+                cell.tempCity?.text = tempCity
+
+            }
+        })
+
     }
     
     func addAndEditItemViewControllerDidCancel(
@@ -93,10 +99,9 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
         // Configure the cell...
         let item = items[indexPath.row]
         configureCityName(for: cell, with: item)
-        configureCityTemp(for: cell, with: item)
+        configureCityTemp(for: cell, with: item, for: indexPath)
         
-//        cell.nameCity?.text = city [indexPath.row].cityName
-//        cell.tempCity?.text = city [indexPath.row].temp
+
         
         return cell
     }

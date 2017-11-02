@@ -15,6 +15,7 @@ class CityWeatherViewController: UIViewController {
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var tempMax: UILabel!
     @IBOutlet weak var tempMin: UILabel!
+    
 //    @IBAction func moreInformation(_ sender: Any) {
 //    }
     
@@ -23,6 +24,7 @@ class CityWeatherViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
         let weatherGetter = WeatherGetter()
         weatherGetter.getWeather(cityName: cityName, callback: {(result) -> () in
             print(result)
