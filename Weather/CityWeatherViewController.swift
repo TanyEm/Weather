@@ -15,6 +15,8 @@ class CityWeatherViewController: UIViewController {
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var tempMax: UILabel!
     @IBOutlet weak var tempMin: UILabel!
+//    @IBAction func moreInformation(_ sender: Any) {
+//    }
     
     var cityName = ""
 
@@ -43,7 +45,8 @@ class CityWeatherViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if (segue.identifier == "FullWeather") {
-            let controller = segue.destination as! FullWeatherTableViewController
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! FullWeatherTableViewController
             controller.cityNameForMoreDay = self.cityName
             print(controller.cityNameForMoreDay)
         }

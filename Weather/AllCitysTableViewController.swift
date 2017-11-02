@@ -11,6 +11,7 @@ import UIKit
 class AllCitysTableViewController: UITableViewController, AddAndEditItemViewControllerDelegate {
     
     var items: [CityItem]
+    var city = [CityItem]()
     let weatherGetter = WeatherGetter()
     
     required init?(coder aDecoder: NSCoder) {
@@ -40,14 +41,17 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
 
     }
 
-    func configureCityName(for cell: UITableViewCell, with item: CityItem) {
-        let labelName = cell.viewWithTag(1000) as! UILabel
-        labelName.text = item.cityName
+    func configureCityName(for cell: AllCitysTableViewCell, with item: CityItem) {
+//        let labelName = cell.viewWithTag(1000) as! UILabel
+//        labelName.text = item.cityName
+        cell.nameCity?.text = item.cityName
+
     }
-    
-    func configureCityTemp(for cell: UITableViewCell, with item: CityItem) {
-        let labelTemp = cell.viewWithTag(1001) as! UILabel
-        labelTemp.text = item.temp
+//
+    func configureCityTemp(for cell: AllCitysTableViewCell, with item: CityItem) {
+//        let labelTemp = cell.viewWithTag(1001) as! UILabel
+//        labelTemp.text = item.temp
+        cell.tempCity?.text = item.temp
     }
     
     func addAndEditItemViewControllerDidCancel(
@@ -59,7 +63,7 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
         if let index = items.index(of: item) {
             let indexPath = IndexPath(row: index, section: 0)
             if let cell = tableView.cellForRow(at: indexPath) {
-                configureCityName(for: cell, with: item)
+                configureCityName(for: cell as! AllCitysTableViewCell, with: item)
             }
         }
         dismiss(animated: true, completion: nil)
@@ -84,12 +88,15 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CityItem", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CityItem", for: indexPath) as! AllCitysTableViewCell
 
         // Configure the cell...
         let item = items[indexPath.row]
         configureCityName(for: cell, with: item)
         configureCityTemp(for: cell, with: item)
+        
+//        cell.nameCity?.text = city [indexPath.row].cityName
+//        cell.tempCity?.text = city [indexPath.row].temp
         
         return cell
     }
