@@ -54,10 +54,8 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
                 let tempCity =  String(format: "%.0f°C", (result.main?.temp)!)
                 print(tempCity)
                 cell.tempCity?.text = tempCity
-
             }
         })
-
     }
     
     func addAndEditItemViewControllerDidCancel(
@@ -72,6 +70,7 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
                 configureCityName(for: cell as! AllCitysTableViewCell, with: item)
             }
         }
+        self.tableView.reloadData()
         dismiss(animated: true, completion: nil)
     }
     
@@ -112,6 +111,7 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
 
         let indexPaths = [indexPath]
         tableView.deleteRows(at: indexPaths, with: .automatic)
+        
     }
 
 
