@@ -7,29 +7,27 @@
 //
 
 import UIKit
+import CoreData
 
 class AllCitysTableViewController: UITableViewController, AddAndEditItemViewControllerDelegate {
+    var cities =  [City]()
     
-    var items: [CityItem]
-    var city = [CityItem]()
-    let weatherGetter = WeatherGetter()
-    
-    required init?(coder aDecoder: NSCoder) {
-        items = [CityItem]()
-        
-        let row0item = CityItem()
-        row0item.cityName = "Saint-Peterburg"
-        row0item.temp = ""
-        items.append(row0item)
-        
-        let row1item = CityItem()
-        row1item.cityName = "Moscow"
-        row1item.temp = ""
-        items.append(row1item)
-        
-        super.init(coder: aDecoder)
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        commonInit()
     }
 
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        commonInit()
+    }
+    
+    private func commonInit() {
+        // iOS not collapsing large navbar workaround
+        navigationItem.largeTitleDisplayMode = .always
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -38,22 +36,26 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
-
+        
+        if let newCities = City.mr_findAll() as? [City] {
+            cities = newCities
+        }
     }
 
-    func configureCityName(for cell: AllCitysTableViewCell, with item: CityItem) {
+    func configureCityName(for cell: AllCitysTableViewCell, with item: City) {
         cell.nameCity?.text = item.cityName
     }
 
-    func configureCityTemp(for cell: AllCitysTableViewCell, with item: CityItem, for indexPath:  IndexPath) {
-    
+    func configureCityTemp(for cell: AllCitysTableViewCell, with item: City, for indexPath:  IndexPath) {
+
         let weatherGetter = WeatherGetter()
-        weatherGetter.getWeather(cityName: items[indexPath.row].cityName, callback: {(result) -> () in
+        weatherGetter.getWeather(cityName: cities[indexPath.row].cityName!, callback: {(result) -> () in
             print(result)
+
             DispatchQueue.main.async {
-                let tempCity =  String(format: "%.0f°C", (result.main?.temp)!)
+                guard let tempCity = result.main?.temp else { return }
                 print(tempCity)
-                cell.tempCity?.text = tempCity
+                cell.tempCity?.text = "\(tempCity)"
             }
         })
     }
@@ -63,8 +65,8 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
         dismiss(animated: true, completion: nil)
     }
     
-    func addAndEditItemViewController(_ controller: AddAndEditItemViewController, didFinishEditing item: CityItem) {
-        if let index = items.index(of: item) {
+    func addAndEditItemViewController(_ controller: AddAndEditItemViewController, didFinishEditing item: City) {
+        if let index = cities.index(of: item) {
             let indexPath = IndexPath(row: index, section: 0)
             if let cell = tableView.cellForRow(at: indexPath) {
                 configureCityName(for: cell as! AllCitysTableViewCell, with: item)
@@ -74,9 +76,9 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
         dismiss(animated: true, completion: nil)
     }
     
-    func addAndEditItemViewController(_ controller: AddAndEditItemViewController, didFinishAdding item: CityItem) {
-        let newRowIndex = items.count
-        items.append(item)
+    func addAndEditItemViewController(_ controller: AddAndEditItemViewController, didFinishAdding item: City) {
+        let newRowIndex = cities.count
+        cities.append(item)
         
         let indexPath = IndexPath(row: newRowIndex, section: 0)
         let indexPaths = [indexPath]
@@ -89,29 +91,39 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return items.count
+        return cities.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CityItem", for: indexPath) as! AllCitysTableViewCell
 
         // Configure the cell...
-        let item = items[indexPath.row]
+        let item = cities[indexPath.row]
         configureCityName(for: cell, with: item)
         configureCityTemp(for: cell, with: item, for: indexPath)
-        
-
         
         return cell
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         
-        items.remove(at: indexPath.row)
-
-        let indexPaths = [indexPath]
-        tableView.deleteRows(at: indexPaths, with: .automatic)
+        let cityToDelete = cities[indexPath.row]
+        if !cityToDelete.mr_deleteEntity() {
+            // ERROR OCCURED
+            print("ERROR DURING ENTITY DELETION")
+        }
         
+        cities.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .left)
+        
+        // No need in background context cause of 1 object deletion
+        NSManagedObjectContext.mr_default().mr_saveToPersistentStore { didSave, error in
+            if !didSave {
+                print(error)
+            } else {
+                print("SUCCESSFULLY SAVED CONTEXT")
+            }
+        }
     }
 
 
@@ -123,24 +135,24 @@ class AllCitysTableViewController: UITableViewController, AddAndEditItemViewCont
         switch segue.identifier {
             
         case "AddCity"?:
-            let navigationController = segue.destination as! UINavigationController
-            let controller = navigationController.topViewController as! AddAndEditItemViewController
+            let navigationController = segue.destination as? UINavigationController
+            let controller = navigationController?.topViewController as? AddAndEditItemViewController
             
-            controller.delegate = self
+            controller?.delegate = self
             
         case "EditCity"?:
-            let navigationController = segue.destination as! UINavigationController
-            let controller = navigationController.topViewController as! AddAndEditItemViewController
-            controller.delegate = self
+            let navigationController = segue.destination as? UINavigationController
+            let controller = navigationController?.topViewController as? AddAndEditItemViewController
+            controller?.delegate = self
             
-            if let indexPath = tableView.indexPath(for: sender as! UITableViewCell) {
-                controller.itemToEdit = items[indexPath.row]
+            if let indexPath = tableView.indexPath(for: (sender as? UITableViewCell)!) {
+                controller?.itemToEdit = cities[indexPath.row]
             }
             
         case "ShowCity"?:
             let path = self.tableView.indexPathForSelectedRow!
-            let viewController = segue.destination as! CityWeatherViewController
-            viewController.cityName = self.items[path.row].cityName
+            let viewController = segue.destination as? CityWeatherViewController
+            viewController?.cityName = self.cities[path.row].cityName!
             
         default:
             print("Error")

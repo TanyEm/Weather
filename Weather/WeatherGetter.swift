@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 
 struct CityWeather: Decodable {
     var weather: [Weather?]

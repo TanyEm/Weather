@@ -8,7 +8,8 @@
 
 import Foundation
 
-class CityItem: NSObject {
-    var cityName = ""
-    var temp = ""
-}
+//class CityItem: NSObject {
+//    var cityName = ""
+//    var temp = ""
+//}
+

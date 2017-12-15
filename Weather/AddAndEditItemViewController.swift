@@ -11,13 +11,14 @@ import UIKit
 
 protocol AddAndEditItemViewControllerDelegate: class {
     func addAndEditItemViewControllerDidCancel(_ controller: AddAndEditItemViewController)
-    func addAndEditItemViewController(_ controller: AddAndEditItemViewController,didFinishAdding item: CityItem)
-    func addAndEditItemViewController(_ controller: AddAndEditItemViewController, didFinishEditing item: CityItem)
+    func addAndEditItemViewController(_ controller: AddAndEditItemViewController,didFinishAdding item: City)
+    func addAndEditItemViewController(_ controller: AddAndEditItemViewController, didFinishEditing item: City)
 }
 
 class AddAndEditItemViewController: UITableViewController, UITextFieldDelegate {
     
-    var itemToEdit: CityItem?
+    var itemToEdit: City?
+//    var itemToEdit: CityItem?
     
     weak var delegate: AddAndEditItemViewControllerDelegate?
     
@@ -33,10 +34,11 @@ class AddAndEditItemViewController: UITableViewController, UITextFieldDelegate {
             item.cityName = textField.text!
             delegate?.addAndEditItemViewController(self, didFinishEditing: item)
         } else {
-            let item = CityItem()
+            let item = City.mr_createEntity() as! City
             item.cityName = textField.text!
             delegate?.addAndEditItemViewController(self, didFinishAdding: item)
         }
+        NSManagedObjectContext.mr_default().mr_saveToPersistentStoreAndWait()
     }
     
     override func viewDidLoad() {
@@ -57,7 +59,7 @@ class AddAndEditItemViewController: UITableViewController, UITextFieldDelegate {
         let oldText = textField.text! as NSString
         let newText = oldText.replacingCharacters(in: range, with: string)
 
-        doneBarButton.isEnabled = (newText.characters.count > 0)
+        doneBarButton.isEnabled = (newText.count > 0)
         
         return true
     }
